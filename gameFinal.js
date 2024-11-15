@@ -25,11 +25,6 @@ function randomElement(min, max) {
 }
 
 function calculateWinProbability(die1, die2) {
-  // If the dice are identical, return a fixed 50% win probability
-  if (die1.every((value, index) => value === die2[index])) {
-    return 0.5;
-  }
-
   let winCount = 0;
   const totalComparisons = die1.length * die2.length;
   // Compare each side of die1 against each side of die2
@@ -57,7 +52,11 @@ function createTable(diceValues) {
     const row = [dice[i].join(", ")]; // Display the sides of the current die
     for (let j = 0; j < numDice; j++) {
       if (i === j) {
-        row.push("0.5 (50%)"); // A die against itself is a 50% chance
+        row.push(
+          `${(1 / dice.length).toFixed(4)} (${
+            (1 / dice.length).toFixed(4) * 100
+          }%)`
+        ); // A die against itself is a 50% chance
       } else {
         const winProbability = calculateWinProbability(dice[i], dice[j]);
         const winPercentage = (winProbability * 100).toFixed(2); // Calculate percentage (rounded to 2 decimal places)
@@ -491,11 +490,11 @@ function userFirstModulo2(userDice, randomDice, answerForModulo) {
     randomObject.randomInt = stateArguments.randomInt;
     randomObject.randomKey = stateArguments.randomKey;
   } else {
-    userThrow =
-      userDiceArray[Math.floor(Math.random() * (userDiceArray.length - 1))];
     Object.assign(stateArguments, { userThrow: userThrow });
     stateArguments.randomInt = randomObject.randomInt;
     stateArguments.randomKey = randomObject.randomKey;
+    userThrow =
+      userDiceArray[(+stateArguments.randomInt + +answerForModulo) % 6];
   }
   console.log(`==============================================================`);
   console.log(`Your selection: ${answerForModulo}`);
@@ -560,7 +559,6 @@ function compFirstModulo2(userDice, randomDice, answerForModulo, randomObject) {
   Object.assign(stateArguments, { answerForModulo1: answerForModulo });
   currentState = "compPicksFirstModulo1";
   console.log(`==============================================================`);
-  console.log(`randomDice en compPicksFirstModulo1: ${randomDice}`);
   const randomDiceArray = randomDice.split(",");
   let computerThrow;
   randomObject = randomElement(0, 5);
@@ -570,7 +568,7 @@ function compFirstModulo2(userDice, randomDice, answerForModulo, randomObject) {
     randomObject.randomKey = stateArguments.randomKey;
   } else {
     computerThrow =
-      randomDiceArray[Math.floor(Math.random() * (randomDiceArray.length - 1))];
+      randomDiceArray[(+randomObject.randomInt + +answerForModulo) % 6];
     Object.assign(stateArguments, { computerThrow: computerThrow });
     stateArguments.randomInt = randomObject.randomInt;
     stateArguments.randomKey = randomObject.randomKey;
@@ -635,9 +633,7 @@ function compFirstModulo2(userDice, randomDice, answerForModulo, randomObject) {
 function userFirstResult(randomDice, answerForModulo, userThrow, randomObject) {
   const computerDiceArray = randomDice.split(",");
   const computerThrow =
-    computerDiceArray[
-      Math.floor(Math.random() * (computerDiceArray.length - 1))
-    ];
+    computerDiceArray[(+randomObject.randomInt + +answerForModulo) % 6];
   console.log(`==============================================================`);
   console.log(`Your selection: ${answerForModulo}`);
   console.log(
@@ -667,8 +663,8 @@ function compFirstResult(
   computerThrow
 ) {
   const userDiceArray = userDice.split(",");
-  let userThrow =
-    userDiceArray[Math.floor(Math.random() * (userDiceArray.length - 1))];
+  const userThrow =
+    userDiceArray[(+randomObject.randomInt + +answerForModulo) % 6];
   console.log(`==============================================================`);
   console.log(`Your selection: ${answerForModulo}`);
   console.log(
